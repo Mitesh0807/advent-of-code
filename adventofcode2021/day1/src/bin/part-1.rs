@@ -64,9 +64,7 @@ fn main() {
     let mut sum = 0;
     let mut previous_line: Option<i32> = None;
 
-    for (index, line) in calibrations.enumerate() {
-        println!("{index} == {}", line);
-
+    for line in calibrations.into_iter() {
         let current_value: i32 = match line.parse() {
             Ok(num) => num,
             Err(_) => {
@@ -76,12 +74,9 @@ fn main() {
         };
 
         if let Some(previous) = previous_line {
-            println!("Previous: {}", previous);
             if previous < current_value {
                 sum += 1;
             }
-        } else {
-            println!("No previous line");
         }
         previous_line = Some(current_value);
     }
