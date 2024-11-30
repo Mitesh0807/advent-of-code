@@ -42,35 +42,41 @@ You can also [Share] this puzzle.
 */
 
 use std::fs::File;
-use std::io::Read;
+use std::io::{self, Read};
 
-fn main() {
+fn main() -> io::Result<()> {
     let mut input = String::new();
-    File::open("input.txt")
-        .unwrap()
-        .read_to_string(&mut input)
-        .unwrap();
+    File::open("input.txt")?.read_to_string(&mut input)?;
 
-    let calibrations = input.lines();
-    let mut sum = 0;
-    let mut previous_line: Option<i32> = None;
+    let mut horizontal = 0;
+    let mut depth = 0;
 
-    for line in calibrations.into_iter() {
-        let current_value: i32 = match line.parse() {
-            Ok(num) => num,
+    for line in input.lines() {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.len() != 2 {
+            println!("Invalid command: {}", line);
+            continue;
+        }
+
+        let command = parts[0];
+        let value: i32 = match parts[1].parse() {
+            Ok(v) => v,
             Err(_) => {
-                println!("Error parsing line: {line}");
+                println!("Invalid value in command: {}", line);
                 continue;
             }
         };
 
-        if let Some(previous) = previous_line {
-            if previous < current_value {
-                sum += 1;
-            }
+        match command {
+            "forward" => horizontal += value,
+            "up" => depth -= value,
+            "down" => depth += value,
+            _ => println!("Unknown command: {}", command),
         }
-        previous_line = Some(current_value);
     }
 
-    println!("Sum: {sum}");
+    println!("Horizontal: {}, Depth: {}", horizontal, depth);
+    println!("Result (horizontal * depth): {}", horizontal * depth);
+
+    Ok(())
 }
